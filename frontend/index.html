@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Search + Embedding + Gemini</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            resize: vertical;
+            min-height: 100px;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .result {
+            margin-top: 20px;
+        }
+
+        .answer {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .stats {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat-badge {
+            background: #e7f3ff;
+            color: #0066cc;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .sources {
+            margin-top: 20px;
+        }
+
+        .sources h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .source-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border-left: 3px solid #28a745;
+        }
+
+        .source-title {
+            font-weight: 600;
+            color: #0066cc;
+            margin-bottom: 5px;
+        }
+
+        .source-link {
+            font-size: 12px;
+            color: #666;
+            word-break: break-all;
+            margin-bottom: 5px;
+        }
+
+        .source-snippet {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.5;
+            margin-bottom: 5px;
+        }
+
+        .source-score {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .error {
+            background: #ffe6e6;
+            color: #cc0000;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #cc0000;
+        }
+
+        .flow {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .flow-step {
+            text-align: center;
+            flex: 1;
+        }
+
+        .flow-number {
+            width: 40px;
+            height: 40px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .flow-label {
+            font-size: 14px;
+            color: #555;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Smart Search with AI</h1>
+            <p>Google Search + Embedding Similarity + Gemini 2.0</p>
+        </div>
+
+        <div class="card">
+            <div class="flow">
+                <div class="flow-step">
+                    <div class="flow-number">1</div>
+                    <div class="flow-label">질문 입력</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-number">2</div>
+                    <div class="flow-label">Google 검색</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-number">3</div>
+                    <div class="flow-label">임베딩 필터링</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-number">4</div>
+                    <div class="flow-label">Gemini 답변</div>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="question">질문을 입력하세요:</label>
+                <textarea
+                    id="question"
+                    placeholder="예: 2024년 파리 올림픽에서 한국은 몇 개의 금메달을 땄나요?">
+                </textarea>
+            </div>
+
+            <button id="askButton" onclick="askQuestion()">
+                질문하기
+            </button>
+        </div>
+
+        <div id="loading" class="card" style="display: none;">
+            <div class="loading">
+                🔄 처리 중입니다...
+            </div>
+        </div>
+
+        <div id="result" class="card" style="display: none;">
+            <div class="result">
+                <div id="stats" class="stats"></div>
+                <div class="answer" id="answer"></div>
+                <div class="sources" id="sources"></div>
+            </div>
+        </div>
+
+        <div id="error" class="card" style="display: none;">
+            <div class="error" id="errorMessage"></div>
+        </div>
+    </div>
+
+    <script>
+        async function askQuestion() {
+            const question = document.getElementById('question').value.trim();
+
+            if (!question) {
+                alert('질문을 입력해주세요.');
+                return;
+            }
+
+            // UI 상태 업데이트
+            document.getElementById('askButton').disabled = true;
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('result').style.display = 'none';
+            document.getElementById('error').style.display = 'none';
+
+            try {
+                const response = await fetch('/api/ask', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ question })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    displayResult(data);
+                } else {
+                    displayError(data.error || '알 수 없는 오류가 발생했습니다.');
+                }
+            } catch (error) {
+                displayError('서버 연결에 실패했습니다: ' + error.message);
+            } finally {
+                document.getElementById('askButton').disabled = false;
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        function displayResult(data) {
+            // Stats
+            const statsHtml = `
+                <div class="stat-badge">📊 검색된 결과: ${data.total_found || 0}개</div>
+                <div class="stat-badge">✅ 필터링된 결과: ${data.filtered_count || 0}개</div>
+            `;
+            document.getElementById('stats').innerHTML = statsHtml;
+
+            // Answer
+            const answerHtml = data.answer.replace(/\n/g, '<br>');
+            document.getElementById('answer').innerHTML = `<strong>답변:</strong><br><br>${answerHtml}`;
+
+            // Sources
+            let sourcesHtml = '<h3>📚 참고 출처</h3>';
+            if (data.sources && data.sources.length > 0) {
+                data.sources.forEach((source, index) => {
+                    sourcesHtml += `
+                        <div class="source-item">
+                            <div class="source-title">[${index + 1}] ${source.title}</div>
+                            <div class="source-link">🔗 ${source.link}</div>
+                            <div class="source-snippet">${source.snippet}</div>
+                            <span class="source-score">관련도: ${(source.similarity_score * 100).toFixed(1)}%</span>
+                        </div>
+                    `;
+                });
+            } else {
+                sourcesHtml += '<p>참고할 출처가 없습니다.</p>';
+            }
+            document.getElementById('sources').innerHTML = sourcesHtml;
+
+            document.getElementById('result').style.display = 'block';
+        }
+
+        function displayError(message) {
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('error').style.display = 'block';
+        }
+
+        // Enter 키로 질문하기
+        document.getElementById('question').addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                askQuestion();
+            }
+        });
+    </script>
+</body>
+</html>
