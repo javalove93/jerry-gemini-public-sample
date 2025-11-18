@@ -22,6 +22,8 @@ JERRY_ADDED_SOURCE/
 ├── requirements.txt        # Python 의존성
 ├── setup_venv.sh          # 가상환경 설정 스크립트
 ├── run.sh                 # 실행 스크립트
+├── env.example            # 환경 변수 샘플 파일
+├── .gitignore             # Git 제외 파일 목록
 └── README.md              # 이 파일
 ```
 
@@ -40,31 +42,40 @@ chmod +x setup_venv.sh
 
 ### 2. 환경 변수 설정
 
-#### Option 1: Vertex AI 사용 (권장)
+`.env` 파일을 생성하여 환경 변수를 설정합니다:
 
 ```bash
-export GOOGLE_CLOUD_PROJECT="your-project-id"
-export GOOGLE_CLOUD_REGION="us-central1"
+# 샘플 파일 복사
+cp env.example .env
+
+# .env 파일 편집
+nano .env  # 또는 원하는 편집기 사용
 ```
 
-#### Option 2: Gemini API Key 사용
+#### `.env` 파일 설정 내용:
+
+**Option 1: Vertex AI 사용 (권장)**
+```bash
+GOOGLE_CLOUD_PROJECT=your-project-id
+GOOGLE_CLOUD_REGION=us-central1
+```
 
 ```bash
-export GEMINI_API_KEY="your-gemini-api-key"
+GEMINI_API_KEY=your-gemini-api-key
 ```
 
-#### Google Custom Search API 설정 (필수)
+**Google Custom Search API 설정 (필수)**
 
 Google Custom Search API를 사용하려면:
 
 1. [Google Cloud Console](https://console.cloud.google.com/)에서 Custom Search API 활성화
 2. API 키 생성
 3. [Programmable Search Engine](https://programmablesearchengine.google.com/)에서 검색 엔진 생성
-4. 환경 변수 설정:
+4. `.env` 파일에 추가:
 
 ```bash
-export GOOGLE_SEARCH_API_KEY="your-custom-search-api-key"
-export GOOGLE_SEARCH_ENGINE_ID="your-search-engine-id"
+GOOGLE_SEARCH_API_KEY=your-custom-search-api-key
+GOOGLE_SEARCH_ENGINE_ID=your-search-engine-id
 ```
 
 **참고**: Google Custom Search API 없이도 코드는 실행되지만, 실제 검색 기능은 작동하지 않습니다.
@@ -73,12 +84,17 @@ export GOOGLE_SEARCH_ENGINE_ID="your-search-engine-id"
 
 ```bash
 chmod +x run.sh
+
+# 기본 포트(5003)로 실행
 ./run.sh
+
+# 또는 원하는 포트 지정
+./run.sh 8080
 ```
 
 서버가 시작되면 브라우저에서 접속:
 ```
-http://localhost:8080
+http://localhost:5003
 ```
 
 ## 🔍 작동 방식

@@ -17,11 +17,17 @@ Simple example: Google Search + Embedding Similarity + Gemini
 """
 
 import os
+from pathlib import Path
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from google import genai
 from googleapiclient.discovery import build
 import numpy as np
+from dotenv import load_dotenv
+
+# Load .env file from project root
+env_path = Path(__file__).parent.parent / '.env'
+load_dotenv(dotenv_path=env_path)
 
 app = Flask(__name__, static_folder='../frontend')
 CORS(app)
@@ -227,5 +233,5 @@ def ask():
 
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 8080))
+    port = int(os.environ.get("PORT", 5003))
     app.run(debug=True, host="0.0.0.0", port=port)

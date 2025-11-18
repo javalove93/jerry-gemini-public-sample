@@ -31,6 +31,15 @@ uv pip install -r requirements.txt
 
 echo "✅ Setup complete!"
 echo ""
+
+# Check if .env file exists
+if [ ! -f ".env" ]; then
+    echo "⚠️  .env file not found!"
+    echo "Please create one from the sample file:"
+    echo "  cp env.example .env"
+    echo "  nano .env  # Edit with your credentials"
+    echo ""
+fi
+
 echo "To activate the virtual environment:"
 echo "  source $VENV_DIR/bin/activate"
-
