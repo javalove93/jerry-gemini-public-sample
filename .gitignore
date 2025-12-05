@@ -43,3 +43,6 @@ Thumbs.db
 
 # Logs
 *.log
+
+.gemini/
+gha-creds-*.json
