@@ -24,6 +24,7 @@ from google import genai
 from googleapiclient.discovery import build
 import numpy as np
 from dotenv import load_dotenv
+import math
 
 # Load .env file from project root
 env_path = Path(__file__).parent.parent / '.env'
@@ -48,6 +49,15 @@ client = genai.Client(vertexai=True, project=PROJECT_ID, location=LOCATION)
 def cosine_similarity(vec1, vec2):
     """Calculate cosine similarity between two vectors."""
     return np.dot(vec1, vec2) / (np.linalg.norm(vec1) * np.linalg.norm(vec2))
+
+
+def euclidean_similarity(vec1, vec2):
+    """
+    Calculate Euclidean similarity between two vectors.
+    Similarity is 1 / (1 + distance)
+    """
+    distance = np.linalg.norm(np.array(vec1) - np.array(vec2))
+    return 1 / (1 + distance)
 
 
 def google_search(query, api_key, engine_id, num_results=5):
